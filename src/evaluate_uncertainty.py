@@ -5,7 +5,7 @@ import torch
 from jaxtyping import Float
 from torch import Tensor
 
-import src.uncertainty as uncertainty
+import src.metrics.uncertainty as uncertainty
 from src.config import Config
 
 logger = logging.getLogger(__name__)

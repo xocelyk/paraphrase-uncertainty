@@ -5,7 +5,7 @@ import torch
 from jaxtyping import Bool
 from torch import Tensor
 
-import src.evaluation as evaluation
+import src.metrics.accuracy as accuracy
 from src.config import Config
 
 logger = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ def evaluate_accuracy(
                 if (question, response) in cache_llm_grader_accuracy:
                     llm_grader_accuracy = cache_llm_grader_accuracy[(question, response)]
                 else:
-                    llm_grader_accuracy = evaluation.calculate_llm_grader_accuracy(
+                    llm_grader_accuracy = accuracy.calculate_llm_grader_accuracy(
                         question, response, answer
                     )
                     cache_llm_grader_accuracy[(question, response)] = llm_grader_accuracy
@@ -86,7 +86,7 @@ def evaluate_accuracy(
 
     # Summarize the results
     mean_accuracy = accuracy_results["llm_grader_accuracy"].mean().item()
-    logger.info("Ask-for-Accuracy Mean: %.3f", mean_accuracy)
+    logger.info("Mean Accuracy: %.3f", mean_accuracy)
 
     return accuracy_results
                 
