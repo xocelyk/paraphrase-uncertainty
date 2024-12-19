@@ -1,0 +1,12 @@
+rouge
+einops
+scikit-learn
+jaxtyping
+datasets
+backoff
+torch
+transformers
+openai==0.28.0
+tabulate
+tornado>=6.4.2
+urllib3<2
