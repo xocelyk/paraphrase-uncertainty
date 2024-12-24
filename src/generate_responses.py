@@ -119,6 +119,7 @@ def _get_perturbation_responses(
           for each generated response
     """
     if config.do_perturb and perturbed_dict:
+        # Sample n_perturb perturbed questions from perturbed_dict
         n_perturb = config.n_perturb
         sample_perturb_questions = data_utils.sample_from_perturbed_questions(
             idx_test,
@@ -126,13 +127,15 @@ def _get_perturbation_responses(
             config
         )
     else:
+        # If not perturbing, use the original question
         n_perturb = 1
         sample_perturb_questions = [question_text]
 
-    example_questions = []         # shape: (n_perturb, 1) or more if storing multiple
-    example_responses = []         # shape: (n_perturb, n_sample)
-    example_answers = []           # shape: (n_perturb, n_sample)
+    example_questions = []
+    example_responses = []
+    example_answers = []
 
+    # For each perturbation, generate a n_sample responses
     for idx_perturb in range(n_perturb):
         q_perturbed = sample_perturb_questions[idx_perturb]
 
@@ -144,7 +147,7 @@ def _get_perturbation_responses(
         else:
             raise NotImplementedError
 
-        # Generate responses from LLM or QA model
+        # Generate responses from LLM
         model_responses = data_utils.generate_response(prompt, config)
 
         example_questions.append([q_perturbed])
