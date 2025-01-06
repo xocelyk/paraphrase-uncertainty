@@ -128,17 +128,28 @@ def parse_response(response):
     response = response.strip()
     return response
 
-def generate_response(prompt, config: Config):
-    completions = models.gpt(
-        system_prompt=None,
-        prompt=prompt,
-        model=config.model,
-        temperature=config.temperature,
-        max_tokens=config.max_tokens,
-        n=config.n_sample,
-        stop=config.stop
-    )
-    return [parse_response(response) for response in completions]
+def generate_response(prompt, config: Config, pipeline, tokenizer):
+    if config.model[:2] == 'gpt':
+        completions = models.gpt(
+            system_prompt=None,
+            prompt=prompt,
+            model=config.model,
+            temperature=config.temperature,
+            max_tokens=config.max_tokens,
+            n=config.n_sample,
+            stop=config.stop
+        )
+        return [parse_response(response) for response in completions]
+    
+    elif config.model[:5] == 'llama':
+        sequences = pipeline(
+            prompt,
+            num_return_sequences=config.n_sample,
+            eos_token_id=tokenizer.eos_token_id,
+            max_length=len(tokenizer(prompt)['input_ids'])+config.max_tokens,
+            truncation=True
+        )
+        return [parse_response(response['generated_text'][len(prompt)+1:].split('\n')[0]) for response in sequences]
 
 def get_cls_embeddings(outputs: np.array, model, tokenizer, to_numpy=True) -> torch.Tensor:
     """

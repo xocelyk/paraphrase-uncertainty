@@ -4,6 +4,10 @@ from typing import Optional
 import einops
 import numpy as np
 
+import torch
+import transformers
+from transformers import AutoTokenizer
+
 from src.config import Config
 from src.utils import data_utils
 
@@ -39,6 +43,23 @@ def generate_responses(config: Config) -> tuple[np.ndarray, np.ndarray, np.ndarr
     responses = [[] for _ in range(len(dataset))]           # shape: (n_test)
     answers = [[] for _ in range(len(dataset))]             # shape: (n_test)
 
+    # Prepare LLaMa model if needed
+    if config.model[:2] == 'gpt':
+        pipeline = ""
+    elif config.model[:5] == 'llama':
+        llama_version = config.model.split('-')[1]
+        params = config.model.split('-')[2]
+        base_or_chat = "" if config.model.split('-')[3] == 'base' else "-chat"
+        model = "meta-llama/Llama-" + llama_version + "-" + params + base_or_chat
+
+        tokenizer = AutoTokenizer.from_pretrained(model)
+        pipeline = transformers.pipeline(
+            "text-generation",
+            model=model,
+            torch_dtype=torch.bfloat16,
+            device_map="auto"
+        )
+
     logger.info("=" * 50)
     logger.info("Generating Responses".center(50))
     logger.info("=" * 50)
@@ -66,7 +87,9 @@ def generate_responses(config: Config) -> tuple[np.ndarray, np.ndarray, np.ndarr
             question_text,
             correct_answer,
             perturbed_questions_dict,
-            config
+            config,
+            pipeline, 
+            tokenizer
         )
 
         # example_questions might be shape (n_perturb, 1)
@@ -104,7 +127,9 @@ def _get_perturbation_responses(
     question_text: str,
     correct_answer: str,
     perturbed_dict: Optional[dict],
-    config: Config
+    config: Config,
+    pipeline: str, 
+    tokenizer
 ) -> tuple[list[list[str]], list[list[str]], list[list[str]]]:
     """
     For each perturbation, generate or retrieve a perturbed question,
@@ -148,7 +173,7 @@ def _get_perturbation_responses(
             raise NotImplementedError
 
         # Generate responses from LLM
-        model_responses = data_utils.generate_response(prompt, config)
+        model_responses = data_utils.generate_response(prompt, config, pipeline, tokenizer)
 
         example_questions.append([q_perturbed])
         example_responses.append(model_responses)
