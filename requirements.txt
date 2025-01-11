@@ -10,3 +10,4 @@ openai==0.28.0
 tabulate
 tornado>=6.4.2
 urllib3<2
+accelerate>=0.26.0

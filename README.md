@@ -26,6 +26,8 @@ Optionally, we also provide a dataset of 6 paraphrases for 1000 questions in the
    pip install -r requirements.txt   ```
 3. Set your OpenAI API key in an environment variable:   ```
    export OPENAI_API_KEY="sk-..."   ```
+4. Set your Hugging Face access token if you plan to use LLaMa as the LLM model: ```
+   huggingface-cli login   ```
 
 ---
 
@@ -58,7 +60,7 @@ verbose: true
 Field descriptions:
 - **dataset**: Which dataset to load (either "trivia_qa" or "nq").  
 - **split**: Which split of the dataset to load (either "train", "validation", or "test"). Default is "validation".
-- **model**: The OpenAI model to use for question answering (e.g., "gpt-3.5-turbo").
+- **model**: The LLM model to use for question answering (e.g., "gpt-3.5-turbo", "llama-2-7b-base", "llama-3.3-70b-chat").
 - **n_test**: Number of examples to test from the dataset.
 - **do_perturb**: Whether to do perturbation sampling for response generation, or to use the original question. If false, **n_perturb** is ignored.
 - **n_perturb**: The number of perturbed questions to sample from the perturbed question set, for each original question, without replacement. If using the pre-generated paraphrases, this should be 6 at most.
