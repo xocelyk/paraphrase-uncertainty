@@ -10,6 +10,8 @@ import torch
 import src.models as models
 from src.config import Config, config
 
+from typing import Optional, Any
+
 device = config.device
 openai.api_key = config.openai_api_key
 
@@ -128,8 +130,8 @@ def parse_response(response):
     response = response.strip()
     return response
 
-def generate_response(prompt, config: Config, pipeline, tokenizer):
-    if config.model[:2] == 'gpt':
+def generate_response(prompt: str, config: Config, pipeline: Optional[Any] = None, tokenizer: Optional[Any] = None):
+    if config.model.startswith('gpt'):
         completions = models.gpt(
             system_prompt=None,
             prompt=prompt,
@@ -141,7 +143,7 @@ def generate_response(prompt, config: Config, pipeline, tokenizer):
         )
         return [parse_response(response) for response in completions]
     
-    elif config.model[:5] == 'llama':
+    elif config.model.startswith('llama'):
         sequences = pipeline(
             prompt,
             num_return_sequences=config.n_sample,

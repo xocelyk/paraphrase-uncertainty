@@ -11,6 +11,8 @@ from transformers import AutoTokenizer
 from src.config import Config
 from src.utils import data_utils
 
+from typing import Any
+
 logger = logging.getLogger(__name__)
 
 def generate_responses(config: Config) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -44,8 +46,9 @@ def generate_responses(config: Config) -> tuple[np.ndarray, np.ndarray, np.ndarr
     answers = [[] for _ in range(len(dataset))]             # shape: (n_test)
 
     # Prepare LLaMa model if needed
-    if config.model[:2] == 'gpt':
-        pipeline = ""
+    if config.model[:3] == 'gpt':
+        pipeline = None
+        tokenizer = None
     elif config.model[:5] == 'llama':
         llama_version = config.model.split('-')[1]
         params = config.model.split('-')[2]
@@ -128,8 +131,8 @@ def _get_perturbation_responses(
     correct_answer: str,
     perturbed_dict: Optional[dict],
     config: Config,
-    pipeline: str, 
-    tokenizer
+    pipeline: Optional[Any] = None, 
+    tokenizer: Optional[Any] = None
 ) -> tuple[list[list[str]], list[list[str]], list[list[str]]]:
     """
     For each perturbation, generate or retrieve a perturbed question,
