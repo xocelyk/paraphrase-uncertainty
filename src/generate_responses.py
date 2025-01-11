@@ -46,10 +46,10 @@ def generate_responses(config: Config) -> tuple[np.ndarray, np.ndarray, np.ndarr
     answers = [[] for _ in range(len(dataset))]             # shape: (n_test)
 
     # Prepare LLaMa model if needed
-    if config.model[:3] == 'gpt':
+    if config.model.startswith('gpt'):
         pipeline = None
         tokenizer = None
-    elif config.model[:5] == 'llama':
+    elif config.model.startswith('llama'):
         llama_version = config.model.split('-')[1]
         params = config.model.split('-')[2]
         base_or_chat = "" if config.model.split('-')[3] == 'base' else "-chat"
